@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../auth/AuthContext';
 import './Upload.css';
 
 const Upload: React.FC = () => {

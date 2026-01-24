@@ -3,7 +3,7 @@ const API_BASE_URL = 'http://localhost:3000';
 
 export interface Post {
   user_id: number;
-  post_id: number;
+  _id: number;
   url_image: string;
   description?: string;
   likes?: number;

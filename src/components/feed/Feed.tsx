@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { postService, Post } from '../../services/postService';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../auth/AuthContext';
 import PostComponent from '../post/Post';
 import './Feed.css';
 
@@ -10,26 +10,27 @@ const Feed: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated, logout, user } = useAuth();
+  const userName = user?.username ?? "Guest";
+  const token = localStorage.getItem("accessToken");
+  // const userName = localStorage.getItem("username");
   const navigate = useNavigate();
 
-//   useEffect(() => {
-//     fetch('http://localhost:3000/comment')
-//         .then(response => response.json())
-//         .then(data => {
-//             console.log('Response from /comment:', data);
-//         })
-//         .catch(error => {
-//             console.error('Error fetching /comment:', error);
-//         });
-// }, []);
+  // useEffect(() => {
+  //    // string | null
+  //   if(!token) {
+  //     navigate('/login');
+  //     return;
+  //   }
+  //   fetchPosts();
+  // }, []);
 
   useEffect(() => {
     // Redirect to login if not authenticated
     // Temporarily disabled for testing
-    // if (!isAuthenticated) {
-    //   navigate('/login');
-    //   return;
-    // }
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
 
     fetchPosts();
   }, [isAuthenticated, navigate]);
@@ -58,10 +59,9 @@ const Feed: React.FC = () => {
     }
   };
 
-  // Temporarily disabled authentication check for testing
-  // if (!isAuthenticated) {
-  //   return null; // Will redirect in useEffect
-  // }
+  if (!isAuthenticated) {
+    return null; // Will redirect in useEffect
+  }
 
   return (
     <div className="feed-container">
@@ -69,7 +69,7 @@ const Feed: React.FC = () => {
         <div className="feed-header-content">
           <h1>Feed</h1>
           <div className="feed-header-actions">
-            <span className="welcome-text">Welcome, {user?.username || 'Guest'}!</span>
+            <span className="welcome-text">Welcome, {userName || 'Guest'}!</span>
             <button 
               onClick={() => navigate('/upload')} 
               className="btn-upload-header"
@@ -109,7 +109,7 @@ const Feed: React.FC = () => {
           ) : (
             <div className="posts-list">
               {posts.map((post) => (
-                <PostComponent key={post.post_id} post={post} />
+                <PostComponent key={post._id} post={post} />
               ))}
             </div>
           )}

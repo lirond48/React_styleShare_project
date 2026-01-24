@@ -9,7 +9,7 @@ interface PostProps {
 
 const Post: React.FC<PostProps> = ({ post }) => {
   const userIdStr = String(post.user_id);
-  const postIdStr = String(post.post_id);
+  const postIdStr = String(post._id);
   
   return (
     <div className="post-card">
@@ -20,7 +20,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
           </div>
           <span className="user-id">User {post.user_id}</span>
         </div>
-        <span className="post-id">#{post.post_id}</span>
+        <span className="post-id">#{post._id}</span>
       </div>
       
       {post.url_image && (

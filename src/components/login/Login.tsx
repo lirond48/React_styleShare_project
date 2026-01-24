@@ -1,17 +1,17 @@
 import React, { useState, FormEvent, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext';
 import './Login.css';
 
 const Login: React.FC = () => {
   const { isAuthenticated, isLoading, error, login, clearError } = useAuth();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   // Redirect to feed if already authenticated
   useEffect(() => {
-    if (true) {
+    if (isAuthenticated) {
       navigate('/feed');
     }
   }, [isAuthenticated, navigate]);
@@ -20,11 +20,11 @@ const Login: React.FC = () => {
     e.preventDefault();
     clearError();
     
-    if (!username.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim()) {
       return;
     }
 
-    const result = await login({ username, password });
+    const result = await login({ email: email.trim(), password_hash: password });
     if (result.success) {
       navigate('/feed');
     }
@@ -40,16 +40,16 @@ const Login: React.FC = () => {
         
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="email">Email</label>
             <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
               disabled={isLoading}
               required
-              autoComplete="username"
+              autoComplete="email"
             />
           </div>
 
@@ -71,11 +71,15 @@ const Login: React.FC = () => {
 
           <button 
             type="submit" 
-            disabled={isLoading || !username.trim() || !password.trim()}
+            disabled={isLoading || !email.trim() || !password.trim()}
             className="btn-login"
           >
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
+
+          <div className="login-footer">
+            <p>Don't have an account? <Link to="/register" className="register-link">Register here</Link></p>
+          </div>
         </form>
       </div>
     </div>

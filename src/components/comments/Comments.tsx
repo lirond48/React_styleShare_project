@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { commentService, Comment } from '../../services/commentService';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../auth/AuthContext';
 import './Comments.css';
 
 interface CommentsProps {
@@ -77,13 +77,18 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
               comments.map((comment) => {
                 const userIdStr = String(comment.user_id);
                 return (
-                  <div key={comment.comment_id} className="comment-item">
+                  <div key={comment._id} className="comment-item">
                     <div className="comment-user-avatar">
                       {userIdStr.charAt(0).toUpperCase()}
                     </div>
                     <div className="comment-content">
                       <div className="comment-header">
                         <span className="comment-user-id">User {comment.user_id}</span>
+                        {comment.created_at && (
+                          <span className="comment-date">
+                            {new Date(comment.created_at).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
                       <p className="comment-text">{comment.comment}</p>
                     </div>
@@ -100,11 +105,11 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Write a comment..."
               className="comment-input"
-              disabled={isSubmitting || !user}
+              disabled={isSubmitting}
             />
             <button
               type="submit"
-              disabled={isSubmitting || !newComment.trim() || !user}
+              disabled={isSubmitting || !newComment.trim()}
               className="comment-submit-btn"
             >
               {isSubmitting ? 'Posting...' : 'Post'}
