@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import './Login.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
 const Login: React.FC = () => {
   const { isAuthenticated, isLoading, error, login, clearError } = useAuth();
   const [email, setEmail] = useState('');
@@ -28,6 +30,14 @@ const Login: React.FC = () => {
     if (result.success) {
       navigate('/feed');
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_BASE_URL}/auth/google`;
+  };
+
+  const handleFacebookLogin = () => {
+    window.location.href = `${API_BASE_URL}/auth/facebook`;
   };
 
   return (
@@ -76,6 +86,28 @@ const Login: React.FC = () => {
           >
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
+
+          <div className="oauth-divider">or</div>
+
+          <div className="oauth-buttons">
+            <button
+              type="button"
+              className="btn-oauth btn-oauth-google"
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
+            >
+              Continue with Google
+            </button>
+
+            <button
+              type="button"
+              className="btn-oauth btn-oauth-facebook"
+              onClick={handleFacebookLogin}
+              disabled={isLoading}
+            >
+              Continue with Facebook
+            </button>
+          </div>
 
           <div className="login-footer">
             <p>Don't have an account? <Link to="/register" className="register-link">Register here</Link></p>
