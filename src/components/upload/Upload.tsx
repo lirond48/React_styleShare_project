@@ -1,15 +1,35 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
+import { postService } from '../../services/postService';
 import './Upload.css';
 
 const Upload: React.FC = () => {
   const [description, setDescription] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const handleFileSelect = (file: File | null) => {
+    if (!file) {
+      setSelectedImage(null);
+      setPreviewUrl('');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file');
+      return;
+    }
+
+    setError(null);
+    setSelectedImage(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,23 +40,24 @@ const Upload: React.FC = () => {
       return;
     }
 
-    if (!imageUrl.trim()) {
-      setError('Please enter an image URL');
+    if (!selectedImage) {
+      setError('Please select an image');
+      return;
+    }
+
+    if (!user?.user_id) {
+      setError('User is not authenticated');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In a real app, you would call the API here:
-      // await postService.createPost({ description, url: imageUrl, user_id: user?.username });
-      
-      console.log('Post created:', { description, url: imageUrl });
-      
-      // Navigate back to feed after successful upload
+      await postService.createPost({
+        user_id: user.user_id,
+        description,
+        image: selectedImage,
+      });
       navigate('/feed');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to upload post';
@@ -60,24 +81,39 @@ const Upload: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="upload-form">
           <div className="form-group">
-            <label htmlFor="imageUrl">Image URL</label>
-            <input
-              type="url"
-              id="imageUrl"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://example.com/image.jpg"
-              disabled={isSubmitting}
-              required
-              className="form-input"
-            />
-            <small className="form-hint">Enter a valid image URL</small>
+            <label>Image</label>
+            <div
+              className={`drop-zone ${isDragOver ? 'drag-over' : ''}`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragOver(true);
+              }}
+              onDragLeave={() => setIsDragOver(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDragOver(false);
+                handleFileSelect(e.dataTransfer.files?.[0] || null);
+              }}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                disabled={isSubmitting}
+                onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
+                className="file-input"
+                id="image"
+              />
+              <label htmlFor="image" className="file-input-label">
+                Drag and drop an image here, or click to choose
+              </label>
+            </div>
+            {selectedImage && <small className="form-hint">Selected: {selectedImage.name}</small>}
           </div>
 
-          {imageUrl && (
+          {previewUrl && (
             <div className="image-preview">
               <img 
-                src={imageUrl} 
+                src={previewUrl} 
                 alt="Preview" 
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -116,7 +152,7 @@ const Upload: React.FC = () => {
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || !description.trim() || !imageUrl.trim()}
+              disabled={isSubmitting || !description.trim() || !selectedImage}
               className="btn-submit"
             >
               {isSubmitting ? 'Uploading...' : 'Upload Post'}

@@ -10,6 +10,10 @@ interface PostProps {
 }
 
 const Post: React.FC<PostProps> = ({ post }) => {
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+  const imageSrc = post.url_image?.startsWith("http")
+    ? post.url_image
+    : `${apiBaseUrl}${post.url_image}`;
   const userIdStr = String(post.user_id);
   const postIdStr = String(post._id);
   
@@ -123,7 +127,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
       {post.url_image && (
         <div className="post-image-container">
           <img 
-            src={post.url_image} 
+            src={imageSrc} 
             alt={post.description || 'Post image'} 
             className="post-image"
             onError={(e) => {

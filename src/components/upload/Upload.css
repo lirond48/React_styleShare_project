@@ -87,6 +87,30 @@
   cursor: not-allowed;
 }
 
+.drop-zone {
+  border: 2px dashed #c7c7c7;
+  border-radius: 10px;
+  padding: 18px;
+  background: #fafafa;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.drop-zone.drag-over {
+  border-color: #667eea;
+  background: #f4f6ff;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-input-label {
+  display: block;
+  text-align: center;
+  cursor: pointer;
+  color: #555;
+}
+
 .form-textarea {
   resize: vertical;
   min-height: 100px;

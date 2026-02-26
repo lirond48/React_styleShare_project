@@ -1,9 +1,9 @@
 // Post service for API calls
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 export interface Post {
-  user_id: number;
-  _id: number;
+  user_id: string | number;
+  _id: string | number;
   url_image: string;
   description?: string;
   likes?: number; // Legacy field name
@@ -12,6 +12,12 @@ export interface Post {
   isLikedByCurrentUser?: boolean; // Alternative field name
   created_at: string | Date;
   updated_at?: string | Date;
+}
+
+export interface CreatePostInput {
+  user_id: string;
+  description: string;
+  image: File;
 }
 
 class PostService {
@@ -44,6 +50,25 @@ class PostService {
       }
       throw new Error('An unexpected error occurred while fetching posts');
     }
+  }
+
+  async createPost(input: CreatePostInput): Promise<Post> {
+    const formData = new FormData();
+    formData.append("user_id", input.user_id);
+    formData.append("description", input.description);
+    formData.append("image", input.image);
+
+    const response = await fetch(`${API_BASE_URL}/post`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: "Failed to create post" }));
+      throw new Error(errorData.error || errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
   }
 }
 
