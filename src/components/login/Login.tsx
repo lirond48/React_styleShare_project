@@ -110,14 +110,14 @@ const Login: React.FC = () => {
               >
                 Continue with Google
               </button>
-              <button
+              {/* <button
                 type="button"
                 className="btn-oauth btn-ghost"
                 onClick={handleFacebookLogin}
                 disabled={isLoading}
               >
                 Continue with Facebook
-              </button>
+              </button> */}
             </div>
 
             <div className="login-footer">
