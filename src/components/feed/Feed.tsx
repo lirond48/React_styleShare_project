@@ -73,7 +73,7 @@ const Feed: React.FC = () => {
     <div className="feed-container">
       <header className="feed-header">
         <div className="feed-header-content">
-          <h1>Feed</h1>
+          <h1>StyleShare</h1>
           <div className="feed-header-actions">
             <span className="welcome-text">Welcome, {userName || 'Guest'}!</span>
             {user && (
